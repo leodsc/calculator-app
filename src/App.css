@@ -1,0 +1,95 @@
+@import url("https://fonts.googleapis.com/css2?&family=Open+Sans:wght@300;400;600;800&display=swap");
+
+:root {
+  font-size: 16px;
+  --equal-digit-color: #5e77cf;
+  --font: "Open Sans", sans-serif;
+  --theme1-color-50: #ddf8ff;
+  --theme1-color-200: #94c7d8;
+  --theme1-color-300: #71acc0;
+  --theme1-color-600: #2c768b;
+  --theme1-color-900: #003948;
+  --theme2-color-50: #fbf8f0;
+  --theme2-color-200: #f5d491;
+  --theme2-color-300: #f2bf5c;
+  --theme2-color-600: #ef971b;
+  --theme2-color-900: #dd6013;
+  --theme3-color-50: #eef8e0;
+  --theme3-color-200: #c2df98;
+  --theme3-color-300: #add472;
+  --theme3-color-600: #7ab02a;
+  --theme3-color-900: #316907;
+}
+
+* {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+button {
+  font-family: "Open Sans", sans-serif;
+}
+
+.app {
+  max-width: 600px;
+}
+
+.screen {
+  height: 300px;
+  padding: 1rem;
+}
+
+.screen__expression {
+  font-size: 2rem;
+  letter-spacing: 1px;
+}
+
+.screen__themes {
+  width: 100px;
+}
+
+.screen__types {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 0.5rem;
+}
+.screen__themes-outer {
+  background-color: white;
+  border: 1px solid #c4c4c4;
+  border-radius: 15px;
+  width: 100%;
+  height: 20px;
+  cursor: pointer;
+}
+
+.screen__themes-inner {
+  background-color: #ff4e4e;
+  height: 100%;
+  width: 20%;
+  border-radius: 100%;
+  transition: 500ms all;
+}
+
+.keyboard {
+  display: grid;
+  grid-template-columns: 0.25fr 0.25fr 0.25fr 0.25fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+}
+
+.keyboard__digit {
+  text-align: center;
+  font-size: 2.5rem;
+  color: white;
+  cursor: pointer;
+  border-right: 1px solid white;
+  border-left: 1px solid white;
+  padding: 1rem;
+}
+
+.keyboard__digit--equal {
+  background-color: var(--equal-digit-color);
+  grid-column: 3/5;
+}

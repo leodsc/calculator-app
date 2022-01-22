@@ -1,0 +1,47 @@
+.screen--theme1 {
+  background-color: var(--theme1-color-50);
+}
+
+.keyboard__digit--top.keyboard__digit--theme1 {
+  background-color: var(--theme1-color-300);
+}
+
+.keyboard__digit--right.keyboard__digit--theme1 {
+  background-color: var(--theme1-color-600);
+}
+
+.keyboard__digit--normal.keyboard__digit--theme1 {
+  background-color: var(--theme1-color-900);
+}
+
+.screen--theme2 {
+  background-color: var(--theme2-color-50);
+}
+
+.keyboard__digit--top.keyboard__digit--theme2 {
+  background-color: var(--theme2-color-300);
+}
+
+.keyboard__digit--right.keyboard__digit--theme2 {
+  background-color: var(--theme2-color-600);
+}
+
+.keyboard__digit--normal.keyboard__digit--theme2 {
+  background-color: var(--theme2-color-900);
+}
+
+.screen--theme3 {
+  background-color: var(--theme3-color-50);
+}
+
+.keyboard__digit--top.keyboard__digit--theme3 {
+  background-color: var(--theme3-color-300);
+}
+
+.keyboard__digit--right.keyboard__digit--theme3 {
+  background-color: var(--theme3-color-600);
+}
+
+.keyboard__digit--normal.keyboard__digit--theme3 {
+  background-color: var(--theme3-color-900);
+}
