@@ -51,6 +51,7 @@ button {
   overflow-y: auto;
   word-break: break-word;
   font-family: var(--font);
+  resize: none;
 }
 
 .screen__expression:focus {
@@ -103,4 +104,8 @@ button {
 .keyboard__digit--equal {
   background-color: var(--equal-digit-color);
   grid-column: 3/5;
+}
+
+.keyboard__icon {
+  cursor: pointer;
 }

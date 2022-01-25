@@ -1,5 +1,6 @@
 import React, { useContext, useRef, useState, useEffect } from 'react';
 import digits from './digits.js';
+// import IconsWrapper from './IconsWrapper';
 import icons from './icons.js';
 import { checkValidity } from './checkValidity.js';
 import './App.css';
@@ -46,7 +47,6 @@ function Screen() {
         const cursorPosition = e.target.selectionStart;
         setCursor(cursorPosition);
       }}
-        cols="20"
         className="screen__expression"
         value={expression}></textarea>
       <p className="screen__result"></p>
@@ -73,7 +73,6 @@ function Themes({ theme, setTheme }) {
       if (old !== 3) return Number(old) + 1;
       else return 1;
     })
-
   }
 
   return (
@@ -126,7 +125,6 @@ function Keyboard() {
 
   }
 
-
   return (
     <div className="keyboard">
       {digits.map(digit => {
@@ -134,8 +132,19 @@ function Keyboard() {
           `keyboard__digit keyboard__digit--theme${theme} keyboard__digit--${digit.position}`
         } onClick={(e) => showDigit(e)} >{digit.char}</button>
       })}
-      {icons.map(Icon => {
-        return <Icon />
+      {icons.map(icon => {
+        const Svg = icon.svg;
+        return (
+          <button onClick={() => {
+            const newExpression = icon.action(cursor, expression);
+            setExpression(newExpression);
+            setCursor((old) => {
+              return old - 1;
+            })
+          }}>
+            <Svg />
+          </button>
+        )
       })}
     </div>
   )
