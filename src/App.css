@@ -30,25 +30,36 @@
 }
 
 button {
-  font-family: "Open Sans", sans-serif;
+  font-family: var(--font);
 }
 
 .app {
-  max-width: 600px;
+  max-width: 385px;
 }
 
 .screen {
   height: 300px;
-  padding: 1rem;
+  padding: 1rem 2rem;
+  word-break: break-all;
 }
 
 .screen__expression {
   font-size: 2rem;
   letter-spacing: 1px;
+  height: 50%;
+  max-width: 100%;
+  overflow-y: auto;
+  word-break: break-word;
+  font-family: var(--font);
+}
+
+.screen__expression:focus {
+  outline: none;
 }
 
 .screen__themes {
   width: 100px;
+  margin-bottom: 1rem;
 }
 
 .screen__types {

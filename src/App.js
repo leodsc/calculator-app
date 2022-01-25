@@ -1,17 +1,25 @@
 import React, { useContext, useRef, useState, useEffect } from 'react';
 import digits from './digits.js';
 import icons from './icons.js';
+import { checkValidity } from './checkValidity.js';
 import './App.css';
 import './themes.css';
 
 const ThemeCtx = React.createContext();
 
 function App() {
-  const [theme, setTheme] = useState(1);
+  let localTheme = localStorage.getItem('theme');
+  if (localTheme == null) {
+    localTheme = 1;
+    localStorage.setItem('theme', 1);
+  }
+
+  const [theme, setTheme] = useState(localTheme);
   const [expression, setExpression] = useState("");
+  const [cursor, setCursor] = useState(1);
 
   return (
-    <ThemeCtx.Provider value={{ theme, setTheme, expression, setExpression }}>
+    <ThemeCtx.Provider value={{ theme, setTheme, expression, setExpression, cursor, setCursor }}>
       <main className="app">
         <Screen />
         <Keyboard />
@@ -22,12 +30,25 @@ function App() {
 }
 
 function Screen() {
-  const { theme, setTheme, expression } = useContext(ThemeCtx);
+  const { theme, setTheme, expression, cursor, setCursor } = useContext(ThemeCtx);
+  const txtarea = useRef(null);
+
+  useEffect(() => {
+    // focus in input to show where the cursor is after clicking in a digit
+    txtarea.current.focus();
+    txtarea.current.setSelectionRange(cursor, cursor);
+  }, [expression])
 
   return (
     <div className={`screen screen--theme${theme}`}>
       <Themes theme={theme} setTheme={setTheme} />
-      <p className="screen__expression">{expression}</p>
+      <textarea ref={txtarea} onClick={(e) => {
+        const cursorPosition = e.target.selectionStart;
+        setCursor(cursorPosition);
+      }}
+        cols="20"
+        className="screen__expression"
+        value={expression}></textarea>
       <p className="screen__result"></p>
     </div>
   )
@@ -36,16 +57,23 @@ function Screen() {
 function Themes({ theme, setTheme }) {
   const themeButton = useRef(null);
 
-  const changeTheme = () => {
-    setTheme(old => {
-      if (old != 3) return old + 1;
-      else return 1
-    })
-    if (theme !== 3) {
-      themeButton.current.style.transform = `translateX(${40 * theme - 1}px)`;
+  useEffect(() => {
+    localStorage.setItem('theme', theme);
+
+    if (theme != 1) {
+      console.log('oi');
+      themeButton.current.style.transform = `translateX(${40 * (theme - 1)}px)`;
     } else {
       themeButton.current.style.transform = `translateX(0px)`;
     }
+  }, [theme])
+
+  const changeTheme = () => {
+    setTheme(old => {
+      if (old !== 3) return Number(old) + 1;
+      else return 1;
+    })
+
   }
 
   return (
@@ -63,13 +91,41 @@ function Themes({ theme, setTheme }) {
 }
 
 function Keyboard() {
-  const { theme, setExpression } = useContext(ThemeCtx);
+  const { theme, expression, setExpression, cursor, setCursor } = useContext(ThemeCtx);
 
   const showDigit = (e) => {
-    setExpression(old => {
-      return old + e.target.textContent;
-    })
+    const value = e.target.textContent;
+
+    // prevent double click
+    e.target.setAttribute("disabled", "true")
+    setTimeout(() => {
+      e.target.removeAttribute("disabled");
+    }, 40)
+
+    // update expression value
+    if (expression !== "") {
+      const stack = expression.split("");
+      const [isDigitValid, newExpression] = checkValidity(value, stack, cursor);
+      if (isDigitValid) {
+        setExpression(newExpression)
+        setCursor(old => {
+          // prevent bug if cursor is at the first value of the expression 
+          // then it only increases by 1 when it is in the second position forward
+          if (old !== 0) {
+            return old + 1;
+          }
+        })
+      }
+    } else {
+      if (!isNaN(value)) {
+        setExpression(old => {
+          return old + value;
+        })
+      }
+    }
+
   }
+
 
   return (
     <div className="keyboard">
@@ -89,7 +145,7 @@ function Options() {
   const { theme } = useContext(ThemeCtx);
 
   return (
-    <div>hello</div>
+    <div></div>
   )
 }
 
