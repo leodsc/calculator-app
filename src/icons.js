@@ -25,12 +25,13 @@ const icons = [
   {
     svg: ClearSymbolIcon,
     action: function (position = null, expression = null) {
-      if (expression[position - 1] >= 0) {
+      if (expression[position - 1] !== undefined && // short circuit to prevent bug
+        // if click on position 0 of the screen and click again in erase
+        expression[position - 1].length > 0) {
         const stack = expression.split("");
-        console.log("first", stack);
         stack.splice(position - 1, 1);
         return stack.join("");
-      }
+      } else return expression;
     }
   }
 ]

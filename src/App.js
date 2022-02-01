@@ -3,10 +3,19 @@ import digits from './digits.js';
 // import IconsWrapper from './IconsWrapper';
 import icons from './icons.js';
 import { checkValidity } from './checkValidity.js';
+import { shutingYardAlgorithm } from './postfix.js';
 import './App.css';
 import './themes.css';
 
+
 const ThemeCtx = React.createContext();
+
+const preventDoubleClick = (target) => {
+  target.setAttribute("disabled", true);
+  setTimeout(() => {
+    target.removeAttribute("disabled");
+  }, 40)
+}
 
 function App() {
   let localTheme = localStorage.getItem('theme');
@@ -18,6 +27,13 @@ function App() {
   const [theme, setTheme] = useState(localTheme);
   const [expression, setExpression] = useState("");
   const [cursor, setCursor] = useState(1);
+
+  useEffect(() => {
+    window.addEventListener('click', () => {
+      const screenExpression = document.querySelector(".screen__expression");
+      screenExpression.focus();
+    })
+  }, [])
 
   return (
     <ThemeCtx.Provider value={{ theme, setTheme, expression, setExpression, cursor, setCursor }}>
@@ -36,7 +52,6 @@ function Screen() {
 
   useEffect(() => {
     // focus in input to show where the cursor is after clicking in a digit
-    txtarea.current.focus();
     txtarea.current.setSelectionRange(cursor, cursor);
   }, [expression])
 
@@ -61,22 +76,23 @@ function Themes({ theme, setTheme }) {
     localStorage.setItem('theme', theme);
 
     if (theme != 1) {
-      console.log('oi');
       themeButton.current.style.transform = `translateX(${40 * (theme - 1)}px)`;
     } else {
       themeButton.current.style.transform = `translateX(0px)`;
     }
   }, [theme])
 
-  const changeTheme = () => {
+  const changeTheme = (e) => {
+    preventDoubleClick(e.currentTarget);
+
     setTheme(old => {
-      if (old !== 3) return Number(old) + 1;
+      if (old != 3) return Number(old) + 1;
       else return 1;
     })
   }
 
   return (
-    <button className="screen__themes" onClick={changeTheme}>
+    <button className="screen__themes" onClick={(e) => changeTheme(e)}>
       <div className="screen__types">
         {[1, 2, 3].map(type => {
           return <p>{type}</p>
@@ -92,14 +108,15 @@ function Themes({ theme, setTheme }) {
 function Keyboard() {
   const { theme, expression, setExpression, cursor, setCursor } = useContext(ThemeCtx);
 
+  const calculate = () => {
+    const postFix = shutingYardAlgorithm();
+  }
+
   const showDigit = (e) => {
     const value = e.target.textContent;
 
     // prevent double click
-    e.target.setAttribute("disabled", "true")
-    setTimeout(() => {
-      e.target.removeAttribute("disabled");
-    }, 40)
+    preventDoubleClick(e.target);
 
     // update expression value
     if (expression !== "") {
@@ -107,14 +124,26 @@ function Keyboard() {
       const [isDigitValid, newExpression] = checkValidity(value, stack, cursor);
       if (isDigitValid) {
         setExpression(newExpression)
-        setCursor(old => {
-          // prevent bug if cursor is at the first value of the expression 
-          // then it only increases by 1 when it is in the second position forward
-          if (old !== 0) {
-            return old + 1;
-          }
-        })
+        if (newExpression.length == 0) {
+          // update cursor position if clear button (C) is clicked
+          setCursor(1);
+        } else if (newExpression.slice(-1) === "(" &&
+          newExpression.slice(-2, -1) !== "(") {
+          setCursor(old => {
+            return old + 2;
+          })
+        }
+        else {
+          setCursor(old => {
+            if (old !== 0) {
+              // prevent bug if cursor is at the first value of the expression 
+              // then it only increases by 1 when it is in the second position forward
+              return old + 1;
+            }
+          })
+        }
       }
+      // calculate();
     } else {
       if (!isNaN(value)) {
         setExpression(old => {
@@ -135,12 +164,18 @@ function Keyboard() {
       {icons.map(icon => {
         const Svg = icon.svg;
         return (
-          <button onClick={() => {
-            const newExpression = icon.action(cursor, expression);
-            setExpression(newExpression);
-            setCursor((old) => {
-              return old - 1;
-            })
+          <button onClick={(e) => {
+            if (expression.length > 0) {
+              const newExpression = icon.action(cursor, expression);
+              setExpression(newExpression);
+              setCursor((old) => {
+                if (newExpression.length > 0) {
+                  return old - 1;
+                } else return 1;
+              })
+            } else setCursor(1);
+
+            preventDoubleClick(e.currentTarget);
           }}>
             <Svg />
           </button>
