@@ -2,7 +2,7 @@ import React, { useContext, useRef, useState, useEffect } from 'react';
 import digits from './digits.js';
 // import IconsWrapper from './IconsWrapper';
 import icons from './icons.js';
-import { checkOperator, checkValidity } from './checkValidity.js';
+import { checkValidity } from './checkValidity.js';
 import calculate from './postfix.js';
 
 import './App.css';
@@ -28,6 +28,7 @@ function App() {
   const [theme, setTheme] = useState(localTheme);
   const [expression, setExpression] = useState("");
   const [cursor, setCursor] = useState(1);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     window.addEventListener('click', () => {
@@ -38,10 +39,12 @@ function App() {
   }, [])
 
   return (
-    <ThemeCtx.Provider value={{ theme, setTheme, expression, setExpression, cursor, setCursor }}>
+    <ThemeCtx.Provider value={{ theme, setTheme, expression, setMessage, setExpression, cursor, setCursor }}>
       <main className="app">
         <Screen />
         <Keyboard />
+        {message !== "" &&
+          <Message setMessage={setMessage} message={message} />}
       </main>
     </ThemeCtx.Provider>
   )
@@ -60,8 +63,10 @@ function Screen() {
     <div className={`screen screen--theme${theme}`}>
       <Themes theme={theme} setTheme={setTheme} />
       <textarea ref={txtarea} onClick={(e) => {
-        const cursorPosition = e.target.selectionStart;
-        setCursor(cursorPosition);
+        if (expression.length !== 0) {
+          const cursorPosition = e.target.selectionStart;
+          setCursor(cursorPosition);
+        }
       }}
         className="screen__expression"
         value={expression}></textarea>
@@ -107,37 +112,66 @@ function Themes({ theme, setTheme }) {
 }
 
 function Keyboard() {
-  const { theme, expression, setExpression, cursor, setCursor } = useContext(ThemeCtx);
+  const { theme, expression, setExpression, cursor, setCursor, setMessage } = useContext(ThemeCtx);
 
   useEffect(() => {
     window.addEventListener('keydown', (e) => {
-      const isNumber = !isNaN(e.key);
-      const isOperator = checkOperator(e.key);
       const isBackspace = e.key === 'Backspace';
-      if (isNumber || isOperator || isBackspace) {
-        showDigit(e);
+      const isEqual = e.key === '=' || e.key === "Enter";
+      const leftArrow = e.key === 'ArrowLeft';
+      const rightArrow = e.key === 'ArrowRight';
+      const digits = document.querySelectorAll(".keyboard__digit");
+
+      if (isBackspace) {
+        digits[2].click();
+      } else if (isEqual) {
+        digits[digits.length - 1].click();
+      } else if (leftArrow || rightArrow) {
+        setMessage(
+          "Funcionalidade usando setas ainda não foi desenvolvida!" +
+          " Use o mouse para selecionar aonde quer digitar");
+      } else {
+        for (const digit of digits) {
+          if (digit.textContent === e.key) {
+            digit.click();
+            break;
+          }
+        }
       }
     });
   }, [])
 
-  const showDigit = (e) => {
-    let value;
-    if (e.type !== "keydown") {
-      value = e.target.textContent;
-    } else {
-      value = e.key;
-    }
+  const changeDigitColor = (e) => {
+    e.target.classList.add("keyboard__digit--active");
+    e.target.classList.remove(`keyboard__digit--theme${theme}`);
+    setTimeout(() => {
+      e.target.classList.remove("keyboard__digit--active");
+      e.target.classList.add(`keyboard__digit--theme${theme}`);
+    }, 100)
+  }
 
-    // prevent double click
+  const eraseDigit = (e) => {
+    if (expression.length > 0) {
+      const newExpression = icons[3].action(cursor, expression);
+      setExpression(newExpression);
+      setCursor((old) => {
+        if (newExpression.length > 0) {
+          return old - 1;
+        } else return 1;
+      })
+    } else setCursor(1);
+    preventDoubleClick(e.currentTarget);
+  }
+
+  const showDigit = (e) => {
+    const value = e.target.textContent;
     preventDoubleClick(e.target);
 
-    // update expression value
     if (expression !== "") {
       const stack = expression.split("");
       const [isDigitValid, newExpression] = checkValidity(value, stack, cursor);
       if (isDigitValid) {
-        setExpression(newExpression)
-        if (newExpression.length == 0) {
+        if (newExpression.length === 0) {
           // update cursor position if clear button (C) is clicked
           setCursor(1);
         } else if (newExpression.slice(-1) === "(" &&
@@ -155,16 +189,15 @@ function Keyboard() {
             }
           })
         }
+        setExpression(newExpression);
+      } else {
+        setMessage("Não é possível adicionar número maior que 15 digitos.");
       }
-      // calculate();
-    } else {
-      if (!isNaN(value)) {
-        setExpression(old => {
-          return old + value;
-        })
-      }
+    } else if (!isNaN(value)) {
+      setExpression(old => {
+        return old + value;
+      })
     }
-
   }
 
   return (
@@ -173,26 +206,19 @@ function Keyboard() {
         return <button className={
           `keyboard__digit keyboard__digit--theme${theme} keyboard__digit--${digit.position}`
         } onClick={(e) => {
+          changeDigitColor(e);
           if (e.target.textContent === "=") {
             const result = calculate(expression);
             if (!isNaN(result)) {
+              setCursor(result.length);
               setExpression(result);
+            } else {
+              setMessage("Valor para calcular é inválido!");
             }
           } else if (e.target.textContent === '⌫') {
-            if (expression.length > 0) {
-              const newExpression = icons[3].action(cursor, expression);
-              setExpression(newExpression);
-              setCursor((old) => {
-                if (newExpression.length > 0) {
-                  return old - 1;
-                } else return 1;
-              })
-            } else setCursor(1);
-            preventDoubleClick(e.currentTarget);
+            eraseDigit(e);
           }
-          else {
-            showDigit(e);
-          }
+          else showDigit(e);
         }} >{digit.char}</button>
       })}
       {/* 
@@ -217,6 +243,20 @@ function Keyboard() {
         )
       })}
       */}
+    </div>
+  )
+}
+
+const Message = ({ message, setMessage }) => {
+  useEffect(() => {
+    setTimeout(() => {
+      setMessage("");
+    }, 3000)
+  })
+
+  return (
+    <div class="app__error-message">
+      <p>{message}</p>
     </div>
   )
 }

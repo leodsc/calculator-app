@@ -33,6 +33,10 @@ button {
   font-family: var(--font);
 }
 
+body {
+  background-color: #222;
+}
+
 #root {
   height: 100vh;
   display: flex;
@@ -43,6 +47,17 @@ button {
 
 .app {
   max-width: 385px;
+}
+
+.app__error-message {
+  background-color: #eb5160;
+  position: absolute;
+  top: 25%;
+  padding: 1rem 2rem;
+  color: snow;
+  font-size: 1.5rem;
+  width: 385px;
+  text-align: center;
 }
 
 .screen {
@@ -107,6 +122,10 @@ button {
   border-right: 1px solid white;
   border-left: 1px solid white;
   padding: 1rem;
+}
+
+.keyboard__digit--active {
+  background-color: #222;
 }
 
 .keyboard__digit--equal {

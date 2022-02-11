@@ -1,4 +1,6 @@
 // https://en.wikipedia.org/wiki/Shunting-yard_algorithm
+// https://www.includehelp.com/c/evaluation-of-postfix-expressions-using-stack-with-c-program.aspx
+// http://mathcenter.oxford.emory.edu/site/cs171/shuntingYardAlgorithm/
 
 import { checkOperator } from "./checkValidity.js";
 
@@ -7,7 +9,6 @@ const joinLargerNumbers = (expression) => {
   const expressionArray = [];
 
   for (let i = 0; i < expression.length; i++) {
-    console.log(expression[i], expressionArray);
     if (isNaN(expression[i])) {
       expressionArray.push(expression[i]);
     } else if (expression.length > 0 && !isNaN(expression[i - 1])) {
@@ -97,9 +98,9 @@ const calculate = (expression) => {
 
 const evaluate = (first, second, operation) => {
   if (operation === "+") return first + second;
-  else if (operation === "-") return first - second;
+  else if (operation === "-") return second - first;
   else if (operation === "x") return first * second;
-  else if (operation === "/") return first / second;
+  else if (operation === "÷") return second / first;
 }
 
 
