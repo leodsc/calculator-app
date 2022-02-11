@@ -2,8 +2,9 @@ import React, { useContext, useRef, useState, useEffect } from 'react';
 import digits from './digits.js';
 // import IconsWrapper from './IconsWrapper';
 import icons from './icons.js';
-import { checkValidity } from './checkValidity.js';
-import { shutingYardAlgorithm } from './postfix.js';
+import { checkOperator, checkValidity } from './checkValidity.js';
+import calculate from './postfix.js';
+
 import './App.css';
 import './themes.css';
 
@@ -33,6 +34,7 @@ function App() {
       const screenExpression = document.querySelector(".screen__expression");
       screenExpression.focus();
     })
+
   }, [])
 
   return (
@@ -40,7 +42,6 @@ function App() {
       <main className="app">
         <Screen />
         <Keyboard />
-        <Options />
       </main>
     </ThemeCtx.Provider>
   )
@@ -108,12 +109,24 @@ function Themes({ theme, setTheme }) {
 function Keyboard() {
   const { theme, expression, setExpression, cursor, setCursor } = useContext(ThemeCtx);
 
-  const calculate = () => {
-    const postFix = shutingYardAlgorithm();
-  }
+  useEffect(() => {
+    window.addEventListener('keydown', (e) => {
+      const isNumber = !isNaN(e.key);
+      const isOperator = checkOperator(e.key);
+      const isBackspace = e.key === 'Backspace';
+      if (isNumber || isOperator || isBackspace) {
+        showDigit(e);
+      }
+    });
+  }, [])
 
   const showDigit = (e) => {
-    const value = e.target.textContent;
+    let value;
+    if (e.type !== "keydown") {
+      value = e.target.textContent;
+    } else {
+      value = e.key;
+    }
 
     // prevent double click
     preventDoubleClick(e.target);
@@ -159,8 +172,30 @@ function Keyboard() {
       {digits.map(digit => {
         return <button className={
           `keyboard__digit keyboard__digit--theme${theme} keyboard__digit--${digit.position}`
-        } onClick={(e) => showDigit(e)} >{digit.char}</button>
+        } onClick={(e) => {
+          if (e.target.textContent === "=") {
+            const result = calculate(expression);
+            if (!isNaN(result)) {
+              setExpression(result);
+            }
+          } else if (e.target.textContent === '⌫') {
+            if (expression.length > 0) {
+              const newExpression = icons[3].action(cursor, expression);
+              setExpression(newExpression);
+              setCursor((old) => {
+                if (newExpression.length > 0) {
+                  return old - 1;
+                } else return 1;
+              })
+            } else setCursor(1);
+            preventDoubleClick(e.currentTarget);
+          }
+          else {
+            showDigit(e);
+          }
+        }} >{digit.char}</button>
       })}
+      {/* 
       {icons.map(icon => {
         const Svg = icon.svg;
         return (
@@ -181,15 +216,8 @@ function Keyboard() {
           </button>
         )
       })}
+      */}
     </div>
-  )
-}
-
-function Options() {
-  const { theme } = useContext(ThemeCtx);
-
-  return (
-    <div></div>
   )
 }
 

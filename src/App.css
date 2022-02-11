@@ -33,6 +33,14 @@ button {
   font-family: var(--font);
 }
 
+#root {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #222;
+}
+
 .app {
   max-width: 385px;
 }

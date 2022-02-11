@@ -28,7 +28,7 @@ const countNumberDigits = (position, stack, type) => {
 }
 
 export const checkValidity = (value, stack, position) => {
-  const previousDigit = stack[position - 1];
+  const previousDigit = stack.slice(-1);
   const nextDigit = stack[position + 1];
 
   if (!isNaN(value)) { // digit is a number
@@ -36,7 +36,6 @@ export const checkValidity = (value, stack, position) => {
     const numberDigitsAfter = countNumberDigits(position - 1, stack, "after");
     const numberDigitsBefore = countNumberDigits(position, stack, "before");
     const numberDigitsTotal = numberDigitsAfter + numberDigitsBefore;
-    console.log(numberDigitsTotal);
 
     if (numberDigitsTotal < MAX_EXPRESSION_LENGTH) {
       stack.splice(position, 0, value);
@@ -45,9 +44,14 @@ export const checkValidity = (value, stack, position) => {
 
   } else if (checkOperator(value)) { // digit is a operator
     const isNeighborhood = {
-      notNumber: isNaN(previousDigit) && isNaN(nextDigit),
+      notNumber: isNaN(previousDigit) && isNaN(nextDigit) && nextDigit !== undefined,
       notSpecial: previousDigit !== '%' && previousDigit !== ')'
     };
+
+    if (checkOperator(previousDigit[0])) {
+      return [false, ""];
+    }
+
     if (isNeighborhood.notNumber &&
       isNeighborhood.notSpecial) {
       return [false, ""];

@@ -8,7 +8,7 @@ const digits = [
     position: "top"
   },
   {
-    char: "%",
+    char: "⌫",
     position: "top"
   },
   {
