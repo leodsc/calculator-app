@@ -1,13 +1,16 @@
 import React, { useContext, useRef, useState, useEffect } from 'react';
+
+// components
+
+// scripts
 import digits from './digits.js';
-// import IconsWrapper from './IconsWrapper';
 import icons from './icons.js';
 import { checkValidity } from './checkValidity.js';
 import calculate from './postfix.js';
+import messages from "./messages.js";
 
 import './App.css';
 import './themes.css';
-
 
 const ThemeCtx = React.createContext();
 
@@ -17,6 +20,7 @@ const preventDoubleClick = (target) => {
     target.removeAttribute("disabled");
   }, 40)
 }
+
 
 function App() {
   let localTheme = localStorage.getItem('theme');
@@ -29,6 +33,7 @@ function App() {
   const [expression, setExpression] = useState("");
   const [cursor, setCursor] = useState(1);
   const [message, setMessage] = useState("");
+  const [language, setLanguage] = useState("");
 
   useEffect(() => {
     window.addEventListener('click', () => {
@@ -36,10 +41,15 @@ function App() {
       screenExpression.focus();
     })
 
+    const userLanguage = navigator.language || navigator.userLanguage;
+    setLanguage(userLanguage);
   }, [])
 
   return (
-    <ThemeCtx.Provider value={{ theme, setTheme, expression, setMessage, setExpression, cursor, setCursor }}>
+    <ThemeCtx.Provider value={{
+      theme, setTheme, expression, setMessage,
+      setExpression, cursor, setCursor, language
+    }}>
       <main className="app">
         <Screen />
         <Keyboard />
@@ -112,7 +122,7 @@ function Themes({ theme, setTheme }) {
 }
 
 function Keyboard() {
-  const { theme, expression, setExpression, cursor, setCursor, setMessage } = useContext(ThemeCtx);
+  const { theme, expression, setExpression, cursor, setCursor, setMessage, language } = useContext(ThemeCtx);
 
   useEffect(() => {
     window.addEventListener('keydown', (e) => {
@@ -127,9 +137,7 @@ function Keyboard() {
       } else if (isEqual) {
         digits[digits.length - 1].click();
       } else if (leftArrow || rightArrow) {
-        setMessage(
-          "Funcionalidade usando setas ainda não foi desenvolvida!" +
-          " Use o mouse para selecionar aonde quer digitar");
+        chooseMessage(messages.arrow);
       } else {
         for (const digit of digits) {
           if (digit.textContent === e.key) {
@@ -140,6 +148,16 @@ function Keyboard() {
       }
     });
   }, [])
+
+
+  const chooseMessage = (messageType) => {
+    // prevent error if language not supported
+    if (messageType[language] !== undefined) {
+      setMessage(messageType[language]);
+    } else {
+      setMessage(messageType["en-US"]);
+    }
+  }
 
   const changeDigitColor = (e) => {
     e.target.classList.add("keyboard__digit--active");
@@ -192,9 +210,9 @@ function Keyboard() {
         setExpression(newExpression);
       } else {
         if (value !== '.') {
-          setMessage("Não é possível adicionar número maior que 15 digitos.");
+          chooseMessage(messages.numberTooLarge);
         } else {
-          setMessage("Não é possível um número decimal ter dois pontos.")
+          chooseMessage(messages.twoDecimalDots);
         }
       }
     } else if (!isNaN(value)) {
@@ -217,7 +235,7 @@ function Keyboard() {
               setCursor(result.length);
               setExpression(result);
             } else {
-              setMessage("Valor para calcular é inválido!");
+              chooseMessage(messages.invalidCalculation);
             }
           } else if (e.target.textContent === '⌫') {
             eraseDigit(e);
