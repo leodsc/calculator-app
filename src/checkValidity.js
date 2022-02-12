@@ -1,5 +1,6 @@
 // check that the digit is valid
 const MAX_EXPRESSION_LENGTH = 15;
+let isDecimal = false;
 
 export const checkOperator = (value) => {
   const operators = ['+', '-', 'x', '÷'];
@@ -43,6 +44,7 @@ export const checkValidity = (value, stack, position) => {
     } else return [false, ""];
 
   } else if (checkOperator(value)) { // digit is a operator
+    isDecimal = false;
     const isNeighborhood = {
       notNumber: isNaN(previousDigit) && isNaN(nextDigit) && nextDigit !== undefined,
       notSpecial: previousDigit !== '%' && previousDigit !== ')'
@@ -70,6 +72,7 @@ export const checkValidity = (value, stack, position) => {
         return [true, stack.join("")];
       }
     } else if (value === '()') {
+      isDecimal = false;
       let parenthesisChar;
       if (checkOperator(value) || previousDigit === '(') {
         parenthesisChar = '(';
@@ -79,6 +82,12 @@ export const checkValidity = (value, stack, position) => {
         stack.splice(position + 1, 0, parenthesisChar);
       } else stack.splice(position, 0, parenthesisChar);
       return [true, stack.join("")];
+    } else if (value === '.') {
+      if (!isNaN(previousDigit) && !isDecimal) {
+        stack.splice(position, 0, '.');
+        isDecimal = true;
+        return [true, stack.join("")];
+      } else return [false, ""];
     }
   }
 }

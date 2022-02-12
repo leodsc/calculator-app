@@ -62,7 +62,7 @@ function Screen() {
   return (
     <div className={`screen screen--theme${theme}`}>
       <Themes theme={theme} setTheme={setTheme} />
-      <textarea ref={txtarea} onClick={(e) => {
+      <textarea inputmode="none" ref={txtarea} onClick={(e) => {
         if (expression.length !== 0) {
           const cursorPosition = e.target.selectionStart;
           setCursor(cursorPosition);
@@ -191,7 +191,11 @@ function Keyboard() {
         }
         setExpression(newExpression);
       } else {
-        setMessage("Não é possível adicionar número maior que 15 digitos.");
+        if (value !== '.') {
+          setMessage("Não é possível adicionar número maior que 15 digitos.");
+        } else {
+          setMessage("Não é possível um número decimal ter dois pontos.")
+        }
       }
     } else if (!isNaN(value)) {
       setExpression(old => {

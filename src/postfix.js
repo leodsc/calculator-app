@@ -9,15 +9,25 @@ const joinLargerNumbers = (expression) => {
   const expressionArray = [];
 
   for (let i = 0; i < expression.length; i++) {
-    if (isNaN(expression[i])) {
+    let isLastDigitNumber = !isNaN(expression[i - 1]);
+    let isLastDigitDecimal = expression[i - 1] === '.';
+    let isCurrentDigitDecimal = expression[i] === '.';
+    let isCurrentDigitNotNumber = isNaN(expression[i]);
+
+    if (isCurrentDigitNotNumber && !isCurrentDigitDecimal) {
       expressionArray.push(expression[i]);
-    } else if (expression.length > 0 && !isNaN(expression[i - 1])) {
+    } else if (
+      expression.length > 0 && (isLastDigitNumber ||
+        isLastDigitDecimal ||
+        isCurrentDigitDecimal)
+    ) {
       const lastNumber = expressionArray.pop();
       expressionArray.push(lastNumber + expression[i]);
     } else {
       expressionArray.push(expression[i]);
     }
   }
+  console.log(expressionArray);
 
   return expressionArray;
 }
