@@ -35,8 +35,11 @@ The app was created using [React.js](https://reactjs.org/) and [netlify](https:/
 <ul>
 
 &#9744; Calculation story
+<br>
 &#9744; Revert last calculation
+<br>
 &#9744; Percentage operator
+<br>
 &#9744; Cientific calculator mode
 
 </ul>
