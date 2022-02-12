@@ -1,25 +1,22 @@
-import { ReactComponent as ClearSymbolIcon } from './images/ClearSymbol.svg';
-import { ReactComponent as FutureIcon } from './images/Future.svg';
-import { ReactComponent as LaboratoryIcon } from './images/Laboratory.svg';
-import { ReactComponent as RestartIcon } from './images/Restart.svg';
+import { ReactComponent as ClearSymbolIcon } from '../images/ClearSymbol.svg';
+import { ReactComponent as FutureIcon } from '../images/Future.svg';
+import { ReactComponent as LaboratoryIcon } from '../images/Laboratory.svg';
+import { ReactComponent as RestartIcon } from '../images/Restart.svg';
 
 const icons = [
   {
     svg: LaboratoryIcon,
     action: function () {
-      console.log('oi');
     }
   },
   {
     svg: FutureIcon,
     action: function () {
-      console.log('oi');
     }
   },
   {
     svg: RestartIcon,
     action: function () {
-      console.log('oi');
     }
   },
   {

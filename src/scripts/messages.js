@@ -16,6 +16,10 @@ const messages = {
   invalidCalculation: {
     "pt-BR": "Valor para calcular é inválido!",
     "en-US": "Invalid value to calculate!"
+  },
+  twoOperatorsSequence: {
+    "pt-BR": "Não é possível adicionar dois operadores seguidos",
+    "en-US": "It is not possible to add two sequence of operators"
   }
 }
 
