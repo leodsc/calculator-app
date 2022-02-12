@@ -35,8 +35,11 @@ O app foi feito utilizando o framework [React.js](https://reactjs.org/) em conju
 <ul>
 
 &#9744; Histórico de cálculos
+<br>
 &#9744; Reverter último cálculo
+<br>
 &#9744; Operador de porcentagem
+<br>
 &#9744; Modo de calculadora científica
 
 </ul>
